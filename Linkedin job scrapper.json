@@ -1,0 +1,287 @@
+{
+  "name": "Linkedin job scrapper",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "391b4b03-f3aa-4022-bc2d-4ffa3c1252ba",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "resource": "Actor tasks",
+        "operation": "Run task and get dataset",
+        "actorTaskId": {
+          "__rl": true,
+          "value": "Mz0ShPgtnD1cFCCtc",
+          "mode": "list",
+          "cachedResultName": "Linkedin Jobs Scraper Mark 1",
+          "cachedResultUrl": "https://console.apify.com/actors/tasks/Mz0ShPgtnD1cFCCtc/input"
+        },
+        "timeout": 180000,
+        "authentication": "apifyOAuth2Api"
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "c460cac8-b8b6-403e-84cb-14d9fe9855f5",
+      "name": "Run task and get dataset",
+      "credentials": {
+        "apifyOAuth2Api": {
+          "id": "tnRfpUnveJ95wzK4",
+          "name": "Apify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "32cc679a-6cca-4b33-b3e7-c003cfac275f",
+              "name": "Company Name",
+              "value": "={{    $json.companyName      || ($json.companyLinkedinUrl            ? decodeURI($json.companyLinkedinUrl.split('/').filter(Boolean).pop())               .replace(/\\?.*$/,'').replace(/-/g,' ')               .replace(/\\b\\w/g, c => c.toUpperCase())           : ''        ) }}",
+              "type": "string"
+            },
+            {
+              "id": "f004abc0-4c0b-4395-b01d-e1b48a41c5fe",
+              "name": "Job Title",
+              "value": "={{ $json.title || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "e26f33b2-cf13-4c4e-9d42-90ba5d5b4f6c",
+              "name": "URL to Posting",
+              "value": "={{ $json.applyUrl || $json.url || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "2c4deb8c-7d9e-4a7c-afa1-4d713b236185",
+              "name": "Job Posted Date",
+              "value": "={{\n  (() => {\n    const src = $json.postedAt || $json.datePosted || '';\n    if(!src) return '';\n    const d = new Date(src);\n    if (isNaN(d)) return '';\n    const dd = String(d.getDate()).padStart(2,'0');\n    const mm = String(d.getMonth()+1).padStart(2,'0');\n    const yy = String(d.getFullYear()).slice(-2);\n    return `${dd}-${mm}-${yy}`;  // dd-mm-yy\n  })()\n}}\n",
+              "type": "string"
+            },
+            {
+              "id": "165fd32a-4cab-4fc3-887a-ee50837e41d9",
+              "name": "Location",
+              "value": "={{ $json.location || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "df0eca42-2005-4dad-9a45-05b2dff5e331",
+              "name": "Job Summary / Key Requirements",
+              "value": "={{ ($json.descriptionText || '').slice(0, 4000) }}",
+              "type": "string"
+            },
+            {
+              "id": "4d048942-0c67-44a3-a4de-1faca3d40d15",
+              "name": "Pay/Stipend",
+              "value": "={{ '' }}   // skipping salary per spec",
+              "type": "string"
+            },
+            {
+              "id": "0de4af22-e84e-41cf-b8a2-383c30e1ed28",
+              "name": "Contact Person",
+              "value": "={{ '' }}   // set later with Hunter.io",
+              "type": "string"
+            },
+            {
+              "id": "62597bf7-a583-4f07-aba1-1a95049b1d14",
+              "name": "Contact Info",
+              "value": "={{ '' }}   // set later with Hunter.io",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        368,
+        0
+      ],
+      "id": "bb4c618b-3e9e-495c-bd7b-a92e43af13b7",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "16RM1LdAZQjKlhizFAw74hDZusKyjLG__sXWr6Gezi4M",
+          "mode": "list",
+          "cachedResultName": "Internship finder",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16RM1LdAZQjKlhizFAw74hDZusKyjLG__sXWr6Gezi4M/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sayfa1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16RM1LdAZQjKlhizFAw74hDZusKyjLG__sXWr6Gezi4M/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Job Title",
+              "displayName": "Job Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "URL to Posting",
+              "displayName": "URL to Posting",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Job Posted Date",
+              "displayName": "Job Posted Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Job Summary / Key Requirements",
+              "displayName": "Job Summary / Key Requirements",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Pay/Stipend",
+              "displayName": "Pay/Stipend",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Contact Person",
+              "displayName": "Contact Person",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Contact Info",
+              "displayName": "Contact Info",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        576,
+        0
+      ],
+      "id": "3722b492-99d0-44ee-a790-083c7e5153a1",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SFKvg1mBrkLr921x",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Run task and get dataset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run task and get dataset": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9b659b59-6edb-44ed-b6d5-20c01d2637f8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9259a8e6b2407d36839b21bcf4a78e833cbab2035551ec7c8c4a268dd1a31c61"
+  },
+  "id": "azdTaFUoE4JKcqKd",
+  "tags": []
+}
